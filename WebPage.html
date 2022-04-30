@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<html lang="en-US">
+
+<title>Test Webpage For Json</title>
+
+<style>
+.button {
+
+  padding: 10px 30px;
+  font-size: 24px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  outline: none;
+  color: #fff;
+  background-color: #2fd04f;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #999;
+}
+
+.button:hover {background-color: #22cc00}
+
+.button:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+.button span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.button span:after {
+  content: '\00bb';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
+
+.button:hover span {
+  padding-right: 25px;
+}
+
+.button:hover span:after {
+  opacity: 1;
+  right: 0;
+}
+
+</style>
+<script>
+
+var connection = new WebSocket('ws://'+location.hostname+':81/');
+
+var button_1_status = 0;
+var button_2_status = 0;
+var sens_data = 0;
+connection.onmessage = function(event){
+
+  var full_data = event.data;
+  console.log(full_data);
+  var data = JSON.parse(full_data);
+  sens_data = data.sens;
+  document.getElementById("sensor_meter").value = sens_data;
+  document.getElementById("sensor_value").innerHTML = sens_data;
+}
+
+function button_1_on()
+{
+   button_1_status = 1; 
+  console.log("LED 1 is ON");
+  send_data();
+}
+
+function button_1_off()
+{
+  button_1_status = 0;
+console.log("LED 1 is OFF");
+send_data();
+}
+
+function button_2_on()
+{
+   button_2_status = 1; 
+  console.log("LED 2 is ON");
+  send_data();
+}
+
+function button_2_off()
+{
+  button_2_status = 0;
+console.log("LED 2 is OFF");
+send_data();
+}
+
+function send_data()
+{
+  var full_data = '{"LED1" :'+button_1_status+',"LED2":'+button_2_status+'}';
+  connection.send(full_data);
+}
+
+
+</script>
+
+<body style="background-color:#FF00FF  ;">
+
+<center>
+<h1 style="background:#80ff80;
+  font-size: 60px;
+  margin-left: 50px;margin-Right: 50px;
+	 color:#000080;
+     border:3px solid Tomato;
+  "> 
+  JSON code Rx & Tx</h1>
+
+<h3 style="background:#00FCF4; margin-left: 650px;margin-Right: 650px;">
+Input:1 </h3>
+
+<button  onclick= "button_1_on()" class="button"><span> On</span></button><button onclick="button_1_off()" class="button"><span> Off</button>
+<h3 style="background:#80ff80; margin-left: 300px;margin-Right: 300px;">
+Input:2 </h3>
+<button onclick="button_2_on()" class="button"><span> On</button><button onclick="button_2_off()" class="button"><span> Off</button>
+</center>
+
+<div style="text-align: center;">
+<h3>Proximity Sensor</h3><meter value="0" min="0" max="1" id="sensor_meter"> </meter><h3 id="sensor_value" style="display: inline-block;"> 2 </h3>
+
+
+</body>
+</html>
+
